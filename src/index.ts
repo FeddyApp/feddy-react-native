@@ -30,6 +30,6 @@ export type {
 } from './api/types';
 
 export { default as FeedbackListView } from './components/FeedbackListView';
-export { FeedbackDetailModal } from './components/FeedbackDetailModal';
+export { default as FeedbackDetailSheet } from './components/FeedbackDetailSheet';
 export { FeedbackSubmitModal } from './components/FeedbackSubmitModal';
 export { default as FeedbackRow } from './components/FeedbackRow';

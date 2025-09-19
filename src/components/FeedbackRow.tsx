@@ -1,6 +1,9 @@
 import type { FC } from 'react';
+import { useMemo } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import type { FeedbackItem } from '../api/types';
+import type { FeddyTheme } from '../styles/theme';
+import { useFeddyTheme } from '../styles/theme';
 
 interface Props {
   feedback: FeedbackItem;
@@ -16,6 +19,8 @@ const STATUS_COLORS: Record<string, string> = {
 };
 
 export const FeedbackRow: FC<Props> = ({ feedback, onVote, onPress }) => {
+  const theme = useFeddyTheme();
+  const styles = useMemo(() => createStyles(theme), [theme]);
   const userVoted = Boolean(feedback.userVoted);
   const statusColor = STATUS_COLORS[feedback.status] ?? '#475569';
 
@@ -65,76 +70,77 @@ export const FeedbackRow: FC<Props> = ({ feedback, onVote, onPress }) => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    padding: 16,
-    backgroundColor: '#0f172a',
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#1e293b',
-    alignItems: 'center',
-  },
-  voteContainer: {
-    width: 56,
-    height: 72,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: '#1e293b',
-    backgroundColor: 'rgba(255,255,255,0.02)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 12,
-  },
-  voteContainerActive: {
-    borderColor: '#f97316',
-    backgroundColor: 'rgba(249,115,22,0.1)',
-  },
-  voteArrow: {
-    fontSize: 18,
-    color: '#94a3b8',
-    marginBottom: 6,
-  },
-  voteArrowActive: {
-    color: '#f97316',
-  },
-  voteCount: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#e2e8f0',
-  },
-  voteCountActive: {
-    color: '#f97316',
-  },
-  content: {
-    flex: 1,
-  },
-  headerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  title: {
-    flex: 1,
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#f8fafc',
-    marginRight: 8,
-  },
-  statusBadge: {
-    borderRadius: 6,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-  },
-  statusText: {
-    fontSize: 10,
-    fontWeight: '600',
-    color: '#f8fafc',
-  },
-  description: {
-    marginTop: 8,
-    fontSize: 14,
-    color: '#cbd5f5',
-  },
-});
+const createStyles = (theme: FeddyTheme) =>
+  StyleSheet.create({
+    container: {
+      flexDirection: 'row',
+      padding: 16,
+      backgroundColor: theme.surface,
+      borderRadius: 12,
+      borderWidth: 1,
+      borderColor: theme.surfaceBorder,
+      alignItems: 'center',
+    },
+    voteContainer: {
+      width: 56,
+      height: 72,
+      borderRadius: 10,
+      borderWidth: 1,
+      borderColor: theme.voteContainerBorder,
+      backgroundColor: theme.voteContainerBackground,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginRight: 12,
+    },
+    voteContainerActive: {
+      borderColor: theme.voteActiveBorder,
+      backgroundColor: theme.voteActiveBackground,
+    },
+    voteArrow: {
+      fontSize: 18,
+      color: theme.voteNeutralText,
+      marginBottom: 6,
+    },
+    voteArrowActive: {
+      color: theme.voteActiveText,
+    },
+    voteCount: {
+      fontSize: 18,
+      fontWeight: '700',
+      color: theme.textPrimary,
+    },
+    voteCountActive: {
+      color: theme.voteActiveText,
+    },
+    content: {
+      flex: 1,
+    },
+    headerRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    title: {
+      flex: 1,
+      fontSize: 16,
+      fontWeight: '600',
+      color: theme.textPrimary,
+      marginRight: 8,
+    },
+    statusBadge: {
+      borderRadius: 6,
+      paddingHorizontal: 8,
+      paddingVertical: 4,
+    },
+    statusText: {
+      fontSize: 10,
+      fontWeight: '600',
+      color: '#ffffff',
+    },
+    description: {
+      marginTop: 8,
+      fontSize: 14,
+      color: theme.textSecondary,
+    },
+  });
 
 export default FeedbackRow;

@@ -12,6 +12,8 @@ import {
   View,
 } from 'react-native';
 import type { FeedbackSubmission } from '../api/types';
+import type { FeddyTheme } from '../styles/theme';
+import { useFeddyTheme } from '../styles/theme';
 
 interface Props {
   visible: boolean;
@@ -40,6 +42,8 @@ export const FeedbackSubmitModal: FC<Props> = ({
   onSubmit,
   defaultType = 'BUG',
 }) => {
+  const theme = useFeddyTheme();
+  const styles = useMemo(() => createStyles(theme), [theme]);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [email, setEmail] = useState('');
@@ -152,7 +156,7 @@ export const FeedbackSubmitModal: FC<Props> = ({
               <TextInput
                 style={styles.input}
                 placeholder="Enter feedback title"
-                placeholderTextColor="#64748b"
+                placeholderTextColor={theme.placeholder}
                 value={title}
                 onChangeText={(value) => {
                   if (value.length <= 50) {
@@ -170,7 +174,7 @@ export const FeedbackSubmitModal: FC<Props> = ({
                 multiline
                 numberOfLines={5}
                 placeholder="Describe your feedback in detail"
-                placeholderTextColor="#64748b"
+                placeholderTextColor={theme.placeholder}
                 value={description}
                 onChangeText={(value) => {
                   if (value.length <= 500) {
@@ -211,7 +215,7 @@ export const FeedbackSubmitModal: FC<Props> = ({
               <TextInput
                 style={styles.input}
                 placeholder="Email"
-                placeholderTextColor="#64748b"
+                placeholderTextColor={theme.placeholder}
                 autoCapitalize="none"
                 keyboardType="email-address"
                 value={email}
@@ -231,7 +235,7 @@ export const FeedbackSubmitModal: FC<Props> = ({
             disabled={!canSubmit}
           >
             {submitting ? (
-              <ActivityIndicator color="#0b1120" />
+              <ActivityIndicator color={theme.buttonPrimaryText} />
             ) : (
               <Text style={styles.submitText}>Submit</Text>
             )}
@@ -242,118 +246,119 @@ export const FeedbackSubmitModal: FC<Props> = ({
   );
 };
 
-const styles = StyleSheet.create({
-  backdrop: {
-    flex: 1,
-    backgroundColor: 'rgba(15,23,42,0.85)',
-    justifyContent: 'center',
-    padding: 16,
-  },
-  modal: {
-    backgroundColor: '#0b1120',
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: '#1f2937',
-    maxHeight: '90%',
-    overflow: 'hidden',
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#1f2937',
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#f8fafc',
-  },
-  close: {
-    fontSize: 16,
-    color: '#38bdf8',
-  },
-  scroll: {
-    maxHeight: 420,
-  },
-  scrollContent: {
-    paddingHorizontal: 20,
-    paddingBottom: 16,
-  },
-  section: {
-    marginTop: 16,
-  },
-  label: {
-    fontSize: 12,
-    color: '#94a3b8',
-    textTransform: 'uppercase',
-    marginBottom: 8,
-  },
-  chipRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
-  chip: {
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 999,
-    backgroundColor: '#0f172a',
-    borderWidth: 1,
-    borderColor: '#1f2937',
-  },
-  chipSelected: {
-    backgroundColor: '#38bdf8',
-    borderColor: '#38bdf8',
-  },
-  chipText: {
-    color: '#94a3b8',
-    fontWeight: '500',
-  },
-  chipTextSelected: {
-    color: '#0b1120',
-  },
-  input: {
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#1f2937',
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    color: '#f8fafc',
-    backgroundColor: '#0f172a',
-  },
-  multiLine: {
-    minHeight: 120,
-    textAlignVertical: 'top',
-  },
-  counter: {
-    marginTop: 4,
-    fontSize: 12,
-    textAlign: 'right',
-    color: '#64748b',
-  },
-  error: {
-    marginHorizontal: 20,
-    marginTop: 12,
-    color: '#f87171',
-  },
-  submitButton: {
-    margin: 20,
-    paddingVertical: 14,
-    borderRadius: 14,
-    backgroundColor: '#38bdf8',
-    alignItems: 'center',
-  },
-  submitButtonDisabled: {
-    backgroundColor: '#1e293b',
-  },
-  submitText: {
-    color: '#0b1120',
-    fontWeight: '600',
-    fontSize: 16,
-  },
-});
+const createStyles = (theme: FeddyTheme) =>
+  StyleSheet.create({
+    backdrop: {
+      flex: 1,
+      backgroundColor: theme.overlay,
+      justifyContent: 'center',
+      padding: 16,
+    },
+    modal: {
+      backgroundColor: theme.modalBackground,
+      borderRadius: 20,
+      borderWidth: 1,
+      borderColor: theme.modalBorder,
+      maxHeight: '90%',
+      overflow: 'hidden',
+    },
+    header: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      paddingHorizontal: 20,
+      paddingVertical: 16,
+      borderBottomWidth: 1,
+      borderBottomColor: theme.modalBorder,
+    },
+    title: {
+      fontSize: 18,
+      fontWeight: '700',
+      color: theme.textPrimary,
+    },
+    close: {
+      fontSize: 16,
+      color: theme.accent,
+    },
+    scroll: {
+      maxHeight: 420,
+    },
+    scrollContent: {
+      paddingHorizontal: 20,
+      paddingBottom: 16,
+    },
+    section: {
+      marginTop: 16,
+    },
+    label: {
+      fontSize: 12,
+      color: theme.textMuted,
+      textTransform: 'uppercase',
+      marginBottom: 8,
+    },
+    chipRow: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: 8,
+    },
+    chip: {
+      paddingHorizontal: 14,
+      paddingVertical: 8,
+      borderRadius: 999,
+      backgroundColor: theme.chipBackground,
+      borderWidth: 1,
+      borderColor: theme.chipBorder,
+    },
+    chipSelected: {
+      backgroundColor: theme.chipSelectedBackground,
+      borderColor: theme.chipSelectedBackground,
+    },
+    chipText: {
+      color: theme.chipText,
+      fontWeight: '500',
+    },
+    chipTextSelected: {
+      color: theme.chipSelectedText,
+    },
+    input: {
+      borderRadius: 12,
+      borderWidth: 1,
+      borderColor: theme.inputBorder,
+      paddingHorizontal: 14,
+      paddingVertical: 12,
+      color: theme.inputText,
+      backgroundColor: theme.inputBackground,
+    },
+    multiLine: {
+      minHeight: 120,
+      textAlignVertical: 'top',
+    },
+    counter: {
+      marginTop: 4,
+      fontSize: 12,
+      textAlign: 'right',
+      color: theme.textMuted,
+    },
+    error: {
+      marginHorizontal: 20,
+      marginTop: 12,
+      color: theme.errorText,
+    },
+    submitButton: {
+      margin: 20,
+      paddingVertical: 14,
+      borderRadius: 14,
+      backgroundColor: theme.buttonPrimaryBackground,
+      alignItems: 'center',
+    },
+    submitButtonDisabled: {
+      backgroundColor: theme.buttonDisabledBackground,
+    },
+    submitText: {
+      color: theme.buttonPrimaryText,
+      fontWeight: '600',
+      fontSize: 16,
+    },
+  });
 
 export default FeedbackSubmitModal;

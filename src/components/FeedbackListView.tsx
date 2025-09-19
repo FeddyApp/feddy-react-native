@@ -25,8 +25,10 @@ import type {
   FeedbackStatus,
   VoteRequest,
 } from '../api/types';
+import type { FeddyTheme } from '../styles/theme';
+import { useFeddyTheme } from '../styles/theme';
 import FeedbackRow from './FeedbackRow';
-import { FeedbackDetailModal } from './FeedbackDetailModal';
+import FeedbackDetailSheet from './FeedbackDetailSheet';
 import { FeedbackSubmitModal } from './FeedbackSubmitModal';
 
 const STATUS_OPTIONS: { value: FeedbackStatus; label: string }[] = [
@@ -60,6 +62,8 @@ if (
 }
 
 export const FeedbackListView: FC = () => {
+  const theme = useFeddyTheme();
+  const styles = useMemo(() => createStyles(theme), [theme]);
   const [status, setStatus] = useState<FeedbackStatus>('IN_REVIEW');
   const [cache, setCache] = useState<FeedbackCache>(INITIAL_CACHE);
   const [loadingMap, setLoadingMap] =
@@ -185,6 +189,15 @@ export const FeedbackListView: FC = () => {
         };
 
         await FeddyAPI.voteFeedback(payload);
+        setSelectedFeedback((current) =>
+          current && current.id === feedbackId
+            ? {
+                ...current,
+                userVoted: true,
+                voteCount: current.voteCount + 1,
+              }
+            : current
+        );
         await loadFeedbacks(status, true);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to submit vote');
@@ -217,7 +230,7 @@ export const FeedbackListView: FC = () => {
         />
       </View>
     ),
-    [handleVote]
+    [handleVote, styles.rowWrapper]
   );
 
   return (
@@ -284,7 +297,7 @@ export const FeedbackListView: FC = () => {
 
       {isLoadingCurrent && data.length === 0 ? (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator color="#38bdf8" />
+          <ActivityIndicator color={theme.accent} />
           <Text style={styles.loadingText}>Loading feedback…</Text>
         </View>
       ) : data.length === 0 ? (
@@ -304,14 +317,14 @@ export const FeedbackListView: FC = () => {
             <RefreshControl
               refreshing={refreshing}
               onRefresh={() => loadFeedbacks(status, true, { refresh: true })}
-              tintColor="#38bdf8"
+              tintColor={theme.refreshControlTint}
             />
           }
           contentContainerStyle={styles.listContent}
         />
       )}
 
-      <FeedbackDetailModal
+      <FeedbackDetailSheet
         visible={selectedFeedback != null}
         feedback={selectedFeedback}
         onDismiss={() => setSelectedFeedback(null)}
@@ -330,114 +343,115 @@ export const FeedbackListView: FC = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-    backgroundColor: '#020617',
-    paddingTop: 24,
-  },
-  headerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    marginBottom: 18,
-  },
-  screenTitle: {
-    fontSize: 22,
-    fontWeight: '700',
-    color: '#e2e8f0',
-  },
-  addButton: {
-    backgroundColor: '#38bdf8',
-    borderRadius: 999,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-  },
-  addButtonText: {
-    color: '#0f172a',
-    fontWeight: '600',
-  },
-  segmentContainer: {
-    flexDirection: 'row',
-    backgroundColor: '#0f172a',
-    borderRadius: 14,
-    marginHorizontal: 20,
-    padding: 4,
-    borderWidth: 1,
-    borderColor: '#1e293b',
-    position: 'relative',
-    overflow: 'hidden',
-  },
-  segmentIndicator: {
-    position: 'absolute',
-    top: 4,
-    bottom: 4,
-    left: 4,
-    borderRadius: 10,
-    backgroundColor: 'rgba(56, 189, 248, 0.18)',
-  },
-  segmentItem: {
-    flex: 1,
-    borderRadius: 10,
-    paddingVertical: 10,
-    alignItems: 'center',
-  },
-  segmentItemActive: {
-    backgroundColor: 'transparent',
-  },
-  segmentLabel: {
-    color: '#94a3b8',
-    fontWeight: '600',
-  },
-  segmentLabelActive: {
-    color: '#0f172a',
-  },
-  error: {
-    marginHorizontal: 20,
-    marginTop: 16,
-    color: '#f87171',
-  },
-  loadingContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 48,
-    gap: 12,
-  },
-  loadingText: {
-    color: '#94a3b8',
-  },
-  emptyState: {
-    marginTop: 64,
-    alignItems: 'center',
-    paddingHorizontal: 32,
-    gap: 12,
-  },
-  emptyIcon: {
-    fontSize: 48,
-  },
-  emptyTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#e2e8f0',
-  },
-  emptySubtitle: {
-    textAlign: 'center',
-    color: '#94a3b8',
-  },
-  listContent: {
-    paddingTop: 20,
-    paddingBottom: 120,
-    paddingHorizontal: 20,
-    gap: 16,
-  },
-  rowWrapper: {
-    shadowColor: '#000',
-    shadowOpacity: 0.12,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 3,
-  },
-});
+const createStyles = (theme: FeddyTheme) =>
+  StyleSheet.create({
+    screen: {
+      flex: 1,
+      backgroundColor: theme.background,
+      paddingTop: 24,
+    },
+    headerRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      paddingHorizontal: 20,
+      marginBottom: 18,
+    },
+    screenTitle: {
+      fontSize: 22,
+      fontWeight: '700',
+      color: theme.textPrimary,
+    },
+    addButton: {
+      backgroundColor: theme.buttonPrimaryBackground,
+      borderRadius: 999,
+      paddingHorizontal: 16,
+      paddingVertical: 8,
+    },
+    addButtonText: {
+      color: theme.buttonPrimaryText,
+      fontWeight: '600',
+    },
+    segmentContainer: {
+      flexDirection: 'row',
+      backgroundColor: theme.segmentBackground,
+      borderRadius: 14,
+      marginHorizontal: 20,
+      padding: 4,
+      borderWidth: 1,
+      borderColor: theme.segmentBorder,
+      position: 'relative',
+      overflow: 'hidden',
+    },
+    segmentIndicator: {
+      position: 'absolute',
+      top: 4,
+      bottom: 4,
+      left: 4,
+      borderRadius: 10,
+      backgroundColor: theme.segmentIndicator,
+    },
+    segmentItem: {
+      flex: 1,
+      borderRadius: 10,
+      paddingVertical: 10,
+      alignItems: 'center',
+    },
+    segmentItemActive: {
+      backgroundColor: 'transparent',
+    },
+    segmentLabel: {
+      color: theme.segmentLabel,
+      fontWeight: '600',
+    },
+    segmentLabelActive: {
+      color: theme.segmentLabelActive,
+    },
+    error: {
+      marginHorizontal: 20,
+      marginTop: 16,
+      color: theme.errorText,
+    },
+    loadingContainer: {
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginTop: 48,
+      gap: 12,
+    },
+    loadingText: {
+      color: theme.textMuted,
+    },
+    emptyState: {
+      marginTop: 64,
+      alignItems: 'center',
+      paddingHorizontal: 32,
+      gap: 12,
+    },
+    emptyIcon: {
+      fontSize: 48,
+    },
+    emptyTitle: {
+      fontSize: 18,
+      fontWeight: '600',
+      color: theme.textPrimary,
+    },
+    emptySubtitle: {
+      textAlign: 'center',
+      color: theme.textMuted,
+    },
+    listContent: {
+      paddingTop: 20,
+      paddingBottom: 120,
+      paddingHorizontal: 20,
+      gap: 16,
+    },
+    rowWrapper: {
+      shadowColor: theme.shadowColor,
+      shadowOpacity: 0.12,
+      shadowRadius: 8,
+      shadowOffset: { width: 0, height: 4 },
+      elevation: 3,
+    },
+  });
 
 export default FeedbackListView;
